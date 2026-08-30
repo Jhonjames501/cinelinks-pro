@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "CineLinks Pro",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "CineLinks Pro",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "/cinelinks-pro/"
+}
