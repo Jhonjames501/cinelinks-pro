@@ -8,5 +8,6 @@
   "short_name": "CineLinks Pro",
   "start_url": "/",
   "theme_color": "#ffffff",
-  "id": "/cinelinks-pro/"
+  "id": "/",
+  "description": "​La mejor plataforma para encontrar tus películas y enlaces favoritos en un solo lugar."
 }
