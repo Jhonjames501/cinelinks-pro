@@ -82,7 +82,7 @@
         #map-container {
             width: 100%;
             height: 280px;
-            background: #111c14; /* Tono campo militar / bosque oscuro */
+            background: #111c14; 
             border: 2px solid #374151;
             border-radius: 4px;
             position: relative;
@@ -90,19 +90,20 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
 
-        /* Personaje y Zombies */
+        /* Personaje y Zombies con cuerpo completo */
         .entity {
             position: absolute;
-            font-size: 22px;
-            width: 30px;
-            height: 30px;
+            font-size: 24px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 3px rgba(0,0,0,0.9));
         }
 
-        /* Controles de Movimiento (Pad Direccional + Disparo) */
+        /* Controles de Movimiento */
         .controls-area {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -145,7 +146,7 @@
         <div>
             <div style="font-size: 55px; margin-bottom: 10px;">🧟‍♂️</div>
             <h1 class="title">Zombie Outbreak</h1>
-            <p class="subtitle">Survival Map v1.0</p>
+            <p class="subtitle">Survival Map v1.1</p>
         </div>
         <div style="width: 100%; max-width: 300px;">
             <button class="btn-main" onclick="startGame()">🎮 Iniciar Supervivencia</button>
@@ -167,7 +168,9 @@
 
         <!-- El Mapa -->
         <div id="map-container">
-            <div id="player" class="entity" style="left: 50%; top: 50%;">🪖</div>
+            <!-- Soldado de cuerpo completo con arma -->
+            <div id="player" class="entity" style="left: 50%; top: 50%;">🏃‍♂️</div>
+            <!-- Zombie -->
             <div id="zombie" class="entity" style="left: 10%; top: 10%;">🧟</div>
         </div>
 
@@ -184,8 +187,8 @@
     </div>
 
     <script>
-        let pX = 200, pY = 140; // Posición inicial del jugador
-        let zX = 50, zY = 50;   // Posición inicial del zombie
+        let pX = 200, pY = 140; 
+        let zX = 50, zY = 50;   
         let score = 0;
         let health = 100;
         let gameInterval;
@@ -205,7 +208,6 @@
             document.getElementById("score-txt").innerText = "Zombies abatidos: 0";
             document.getElementById("hp-txt").innerText = "Salud: 100%";
             
-            // Bucle principal del juego (mueve al zombie hacia ti constantemente)
             clearInterval(gameInterval);
             gameInterval = setInterval(updateGame, 80);
         }
@@ -220,7 +222,6 @@
             pX += dx;
             pY += dy;
             
-            // Limitar al tamaño del mapa (ancho aprox 400, alto 280)
             if (pX < 15) pX = 15;
             if (pX > 385) pX = 385;
             if (pY < 15) pY = 15;
@@ -232,13 +233,11 @@
         function updateGame() {
             if (!isPlaying) return;
 
-            // IA simple del zombie: persigue al jugador paso a paso
             if (zX < pX) zX += 3;
             if (zX > pX) zX -= 3;
             if (zY < pY) zY += 3;
             if (zY > pY) zY -= 3;
 
-            // Verificar si el zombie te alcanza (colisión)
             let distancia = Math.hypot(pX - zX, pY - zY);
             if (distancia < 20) {
                 health -= 5;
@@ -265,12 +264,10 @@
         function fireWeapon() {
             if (!isPlaying) return;
             
-            // Si disparas y el zombie está cerca, lo eliminas y reaparece lejos
             let distancia = Math.hypot(pX - zX, pY - zY);
             if (distancia < 90) {
                 score++;
                 document.getElementById("score-txt").innerText = "Zombies abatidos: " + score;
-                // Reaparecer zombie en otra parte del mapa aleatoria
                 zX = Math.random() > 0.5 ? 20 : 380;
                 zY = Math.random() > 0.5 ? 20 : 250;
             }
