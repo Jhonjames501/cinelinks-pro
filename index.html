@@ -3,142 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZOMBIE SURVIVAL: TACTICAL MAP</title>
+    <title>ZOMBIE SURVIVAL: V-JOYSTICK</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
-        body { 
-            background: #050508; 
-            color: #fff; 
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            overflow: hidden; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; user-select: none; }
+        body { background: #050508; color: #fff; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        .screen { 
-            display: none; 
-            width: 100%; 
-            height: 100%; 
-            max-width: 480px; 
-            padding: 15px; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            position: absolute; 
-            top: 0; 
-            background: #090d16;
-            border: 1px solid #1e293b;
-        }
+        .screen { display: none; width: 100%; height: 100%; max-width: 480px; padding: 15px; flex-direction: column; justify-content: space-between; position: absolute; top: 0; background: #090d16; border: 1px solid #1e293b; }
         .screen.active { display: flex; }
 
-        #menu-screen { 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            background: radial-gradient(circle at center, #1a0305 0%, #050508 80%);
-        }
-        .title { 
-            font-size: 34px; 
-            font-weight: 900; 
-            color: #ef4444; 
-            text-transform: uppercase; 
-            letter-spacing: 3px; 
-            text-shadow: 0 0 15px rgba(239,68,68,0.7);
-            margin-bottom: 5px;
-        }
+        #menu-screen { justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #1a0305 0%, #050508 80%); }
+        .title { font-size: 34px; font-weight: 900; color: #ef4444; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 15px rgba(239,68,68,0.7); margin-bottom: 5px; }
         .subtitle { font-size: 11px; color: #64748b; letter-spacing: 5px; margin-bottom: 30px; }
 
-        .btn-main {
-            width: 100%;
-            padding: 15px;
-            background: #ef4444;
-            border: none;
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            box-shadow: 0 4px 15px rgba(239,68,68,0.4);
-            margin-bottom: 10px;
-        }
+        .btn-main { width: 100%; padding: 15px; background: #ef4444; border: none; color: white; font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 15px rgba(239,68,68,0.4); margin-bottom: 10px; }
         .btn-main:active { transform: scale(0.97); background: #dc2626; }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            background: #111827;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: bold;
-            border-left: 4px solid #ef4444;
-        }
+        .game-header { display: flex; justify-content: space-between; background: #111827; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; border-left: 4px solid #ef4444; }
 
-        /* Mapa Abierto con Obstáculos */
-        #map-container {
-            width: 100%;
-            height: 270px;
-            background: #111c14; 
-            border: 2px solid #374151;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
+        /* Mapa de juego */
+        #map-container { width: 100%; height: 320px; background: #111c14; border: 2px solid #374151; border-radius: 4px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin-top: 10px; }
 
-        .entity {
-            position: absolute;
-            font-size: 24px;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: translate(-50%, -50%);
-            filter: drop-shadow(0 0 3px rgba(0,0,0,0.9));
-        }
+        .entity { position: absolute; font-size: 24px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transform: translate(-50%, -50%); filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); z-index: 2; }
+        .obstacle { position: absolute; background: #292524; border: 1px solid #57534e; border-radius: 3px; }
 
-        /* Obstáculos en el mapa (Paredes / Cajas) */
-        .obstacle {
-            position: absolute;
-            background: #292524;
-            border: 1px solid #57534e;
-            border-radius: 3px;
-        }
+        /* NUEVO: Área de controles (Joystick + Fuego) */
+        .controls-ui { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; height: 140px; }
 
-        .controls-area {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-        .ctrl-btn {
-            background: #1f293d;
-            border: 1px solid #475569;
-            color: white;
-            font-size: 16px;
-            padding: 12px 0;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-        }
-        .ctrl-btn:active { background: #334155; }
-        .fire-action-btn {
-            grid-column: span 3;
-            background: #ef4444;
-            border: none;
-            color: white;
-            font-weight: bold;
-            padding: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .fire-action-btn:active { background: #dc2626; }
+        /* NUEVO: Estilo del Joystick Virtual */
+        #joystick-base { width: 100px; height: 100px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; position: relative; touch-action: none; }
+        #joystick-stick { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; top: 25px; left: 25px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+
+        /* Botón de disparo */
+        #fire-btn { width: 100px; height: 100px; background: #ef4444; border: none; color: white; font-weight: bold; border-radius: 50%; font-size: 16px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.4); touch-action: none; }
+        #fire-btn:active { background: #dc2626; transform: scale(0.96); }
 
         .back-link { background: none; border: none; color: #64748b; font-size: 11px; cursor: pointer; text-align: left; }
     </style>
@@ -149,11 +46,10 @@
         <div>
             <div style="font-size: 55px; margin-bottom: 10px;">🧟‍♂️</div>
             <h1 class="title">Zombie Outbreak</h1>
-            <p class="subtitle">Tactical Map v1.2</p>
+            <p class="subtitle">V-Joystick Ops v1.3</p>
         </div>
         <div style="width: 100%; max-width: 300px;">
             <button class="btn-main" onclick="startGame()">🎮 Iniciar Supervivencia</button>
-            <button class="btn-main" style="background: #1f293d; border: 1px solid #374151;" onclick="shareApp()">🔗 Compartir App</button>
         </div>
     </div>
 
@@ -168,33 +64,27 @@
             <span id="hp-txt" style="color: #ef4444;">Salud: 100%</span>
         </div>
 
-        <!-- Mapa con Obstáculos -->
         <div id="map-container">
-            <!-- Obstáculos fijos que bloquean el paso -->
-            <div class="obstacle" style="left: 120px; top: 70px; width: 60px; height: 20px;"></div>
-            <div class="obstacle" style="left: 240px; top: 160px; width: 20px; height: 70px;"></div>
-            <div class="obstacle" style="left: 80px; top: 180px; width: 50px; height: 20px;"></div>
+            <div class="obstacle" style="left: 100px; top: 50px; width: 80px; height: 25px;"></div>
+            <div class="obstacle" style="left: 220px; top: 150px; width: 25px; height: 90px;"></div>
+            <div class="obstacle" style="left: 300px; top: 200px; width: 60px; height: 25px;"></div>
+            <div class="obstacle" style="left: 50px; top: 260px; width: 70px; height: 25px;"></div>
 
-            <!-- Personaje y Zombie -->
             <div id="player" class="entity" style="left: 50%; top: 50%;">🚶‍♂️</div>
             <div id="zombie" class="entity" style="left: 15%; top: 15%;">🧟</div>
         </div>
 
-        <!-- Controles -->
-        <div class="controls-area">
-            <div></div>
-            <button class="ctrl-btn" onclick="movePlayer(0, -12)">▲</button>
-            <div></div>
-            <button class="ctrl-btn" onclick="movePlayer(-12, 0)">◄</button>
-            <button class="ctrl-btn" onclick="movePlayer(0, 12)">▼</button>
-            <button class="ctrl-btn" onclick="movePlayer(12, 0)">►</button>
-            <button class="fire-action-btn" onclick="fireWeapon()">💥 DISPARAR</button>
+        <div class="controls-ui">
+            <div id="joystick-base">
+                <div id="joystick-stick"></div>
+            </div>
+            <button id="fire-btn">💥 FUEGO</button>
         </div>
     </div>
 
     <script>
-        let pX = 200, pY = 130; 
-        let zX = 40, zY = 40;   
+        let pX = 200, pY = 160; 
+        let zX = 50, zY = 50;   
         let score = 0;
         let health = 100;
         let gameInterval;
@@ -202,10 +92,62 @@
         let legAnim = false;
 
         const obstacles = [
-            { x1: 120, x2: 180, y1: 70, y2: 90 },
-            { x1: 240, x2: 260, y1: 160, y2: 230 },
-            { x1: 80, x2: 130, y1: 180, y2: 200 }
+            { x1: 100, x2: 180, y1: 50, y2: 75 },
+            { x1: 220, x2: 245, y1: 150, y2: 240 },
+            { x1: 300, x2: 360, y1: 200, y2: 225 },
+            { x1: 50, x2: 120, y1: 260, y2: 285 }
         ];
+
+        // LÓGICA DEL JOYSTICK VIRTUAL
+        const joystickBase = document.getElementById('joystick-base');
+        const joystickStick = document.getElementById('joystick-stick');
+        let joystickActive = false;
+        let joyX = 0, joyY = 0;
+
+        joystickBase.addEventListener('touchstart', handleStart);
+        joystickBase.addEventListener('touchmove', handleMove, { passive: false });
+        joystickBase.addEventListener('touchend', handleEnd);
+        joystickBase.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+
+        function handleStart(e) {
+            if (!isPlaying) return;
+            joystickActive = true;
+            updateJoystick(e);
+        }
+
+        function handleMove(e) {
+            if (!joystickActive || !isPlaying) return;
+            e.preventDefault(); // Evita el scroll de la página
+            updateJoystick(e);
+        }
+
+        function handleEnd(e) {
+            if (!joystickActive) return;
+            joystickActive = false;
+            // Resetear posición visual del stick
+            joystickStick.style.transform = `translate(0px, 0px)`;
+            joyX = 0; joyY = 0;
+        }
+
+        function updateJoystick(e) {
+            const rect = joystickBase.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const deltaX = clientX - centerX;
+            const deltaY = clientY - centerY;
+            const distance = Math.min(50, Math.hypot(deltaX, deltaY)); // Limitar a radio de 50px
+
+            joyX = deltaX / 50; // Normalizar entre -1 y 1
+            joyY = deltaY / 50;
+
+            joystickStick.style.transform = `translate(${joyX * 25}px, ${joyY * 25}px)`; // Mover el stick visualmente
+        }
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -214,107 +156,88 @@
 
         function startGame() {
             showScreen('game-screen');
-            pX = 200; pY = 130;
-            zX = 40; zY = 40;
-            score = 0;
-            health = 100;
+            pX = 200; pY = 160; zX = 50; zY = 50; score = 0; health = 100;
             isPlaying = true;
             document.getElementById("score-txt").innerText = "Zombies abatidos: 0";
             document.getElementById("hp-txt").innerText = "Salud: 100%";
-            
             clearInterval(gameInterval);
-            gameInterval = setInterval(updateGame, 80);
+            gameInterval = setInterval(updateGame, 50); // Bucle más rápido para fluidez del joystick
         }
 
         function stopGame() {
             isPlaying = false;
             clearInterval(gameInterval);
+            handleEnd(); // Resetear joystick al salir
         }
 
         function checkCollision(x, y) {
-            // Bordes del mapa
-            if (x < 15 || x > 385 || y < 15 || y > 255) return true;
-            // Obstáculos
+            if (x < 15 || x > 385 || y < 15 || y > 305) return true;
             for (let obs of obstacles) {
-                if (x >= obs.x1 - 10 && x <= obs.x2 + 10 && y >= obs.y1 - 10 && y <= obs.y2 + 10) {
-                    return true;
-                }
+                if (x >= obs.x1 - 10 && x <= obs.x2 + 10 && y >= obs.y1 - 10 && y <= obs.y2 + 10) return true;
             }
             return false;
-        }
-
-        function movePlayer(dx, dy) {
-            if (!isPlaying) return;
-            
-            let nextX = pX + dx;
-            let nextY = pY + dy;
-
-            if (!checkCollision(nextX, nextY)) {
-                pX = nextX;
-                pY = nextY;
-            }
-
-            // Animación alterna de piernas al caminar
-            legAnim = !legAnim;
-            document.getElementById("player").innerText = legAnim ? "🏃‍♂️" : "🚶‍♂️";
-
-            updatePositions();
         }
 
         function updateGame() {
             if (!isPlaying) return;
 
-            // IA del zombie esquivando ligeramente o moviéndose hacia ti
-            let zDx = 0, zDy = 0;
-            if (zX < pX) zDx = 2.5;
-            if (zX > pX) zDx = -2.5;
-            if (zY < pY) zDy = 2.5;
-            if (zY > pY) zDy = -2.5;
+            // MOVER JUGADOR SEGÚN EL JOYSTICK
+            if (joystickActive) {
+                let moveSpeed = 7; // Velocidad de movimiento
+                let nextX = pX + joyX * moveSpeed;
+                let nextY = pY + joyY * moveSpeed;
 
-            // Mover en X y comprobar obstáculos
+                if (!checkCollision(nextX, nextY)) {
+                    pX = nextX;
+                    pY = nextY;
+                }
+
+                // Animación alterna de piernas
+                legAnim = !legAnim;
+                document.getElementById("player").innerText = legAnim ? "🏃‍♂️" : "🚶‍♂️";
+            }
+
+            // IA del zombie (persigue al jugador)
+            let zDx = 0, zDy = 0;
+            if (zX < pX) zDx = 2.2;
+            if (zX > pX) zDx = -2.2;
+            if (zY < pY) zDy = 2.2;
+            if (zY > pY) zDy = -2.2;
             if (!checkCollision(zX + zDx, zY)) zX += zDx;
-            // Mover en Y y comprobar obstáculos
             if (!checkCollision(zX, zY + zDy)) zY += zDy;
 
+            // Colisión zombie-jugador
             let distancia = Math.hypot(pX - zX, pY - zY);
-            if (distancia < 22) {
-                health -= 4;
+            if (distancia < 24) {
+                health -= 3;
                 document.getElementById("hp-txt").innerText = "Salud: " + health + "%";
                 if (health <= 0) {
-                    alert("¡Te han atrapado! Fin de la partida.");
-                    stopGame();
-                    showScreen('menu-screen');
+                    alert("¡Te han devorado! Fin de la partida.");
+                    stopGame(); showScreen('menu-screen');
                 }
             }
 
-            updatePositions();
-        }
-
-        function updatePositions() {
+            // Actualizar posiciones
             document.getElementById("player").style.left = pX + "px";
             document.getElementById("player").style.top = pY + "px";
             document.getElementById("zombie").style.left = zX + "px";
             document.getElementById("zombie").style.top = zY + "px";
         }
 
-        function fireWeapon() {
+        // El botón de disparo ahora usa la posición actual del jugador
+        document.getElementById('fire-btn').addEventListener('mousedown', fireWeapon);
+        document.getElementById('fire-btn').addEventListener('touchstart', fireWeapon);
+
+        function fireWeapon(e) {
+            e.preventDefault(); // Evita que el toque active el mouse también
             if (!isPlaying) return;
             
             let distancia = Math.hypot(pX - zX, pY - zY);
-            if (distancia < 85) {
+            if (distancia < 95) {
                 score++;
-                document.getElementById("score-txt").innerText = "Zombies abatidos: "+ score;
-                // Reaparecer zombie lejos
-                zX = Math.random() > 0.5 ? 30 : 360;
-                zY = Math.random() > 0.5 ? 30 : 230;
-            }
-        }
-
-        function shareApp() {
-            if (navigator.share) {
-                navigator.share({ title: 'Zombie Outbreak', text: '¡Juega a mi juego táctico!', url: window.location.href }).catch(() => {});
-            } else {
-                alert("Enlace copiado: " + window.location.href);
+                document.getElementById("score-txt").innerText = "Zombies abatidos: " + score;
+                zX = Math.random() > 0.5 ? 30 : 370;
+                zY = Math.random() > 0.5 ? 30 : 290;
             }
         }
     </script>
