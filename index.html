@@ -280,3 +280,16 @@
     </script>
 </body>
 </html>
+        function compartirApp() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'CineLinks Pro',
+                    text: '¡Descarga CineLinks Pro, mi propia app de entretenimiento y juegos!',
+                    url: window.location.href // Esto comparte tu link de GitHub actual
+                }).catch((error) => console.log('Error al compartir', error));
+            } else {
+                // Si la compu o navegador no soporta compartir nativo, copia el link o avisa
+                alert("Copia este enlace para compartir tu app: " + window.location.href);
+            }
+        }
+        
