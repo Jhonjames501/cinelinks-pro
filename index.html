@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZOMBIE SURVIVAL: REALISTIC SHOOTER</title>
+    <title>ZOMBIE SURVIVAL: BIG MAP</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; user-select: none; }
         body { background: #050508; color: #fff; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        .screen { display: none; width: 100%; height: 100%; max-width: 480px; padding: 15px; flex-direction: column; justify-content: space-between; position: absolute; top: 0; background: #090d16; border: 1px solid #1e293b; }
+        .screen { display: none; width: 100%; height: 100%; max-width: 480px; padding: 12px; flex-direction: column; justify-content: space-between; position: absolute; top: 0; background: #090d16; border: 1px solid #1e293b; }
         .screen.active { display: flex; }
 
         #menu-screen { justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #1a0305 0%, #050508 80%); }
@@ -18,19 +18,19 @@
         .btn-main { width: 100%; padding: 15px; background: #ef4444; border: none; color: white; font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 15px rgba(239,68,68,0.4); margin-bottom: 10px; }
         .btn-main:active { transform: scale(0.97); background: #dc2626; }
 
-        .game-header { display: flex; justify-content: space-between; background: #111827; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; border-left: 4px solid #ef4444; }
+        .game-header { display: flex; justify-content: space-between; background: #111827; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; border-left: 4px solid #ef4444; }
 
-        /* Mapa de juego */
-        #map-container { width: 100%; height: 320px; background: #111c14; border: 2px solid #374151; border-radius: 4px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin-top: 10px; }
+        /* MAPA MÁS GRANDE (Ancho 450px, Alto 340px) */
+        #map-container { width: 100%; height: 340px; background: #111c14; border: 2px solid #374151; border-radius: 4px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin-top: 5px; }
 
         .entity { position: absolute; font-size: 24px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transform: translate(-50%, -50%); filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); z-index: 2; }
         .obstacle { position: absolute; background: #292524; border: 1px solid #57534e; border-radius: 3px; z-index: 1; }
 
-        /* EFECTO DE LA BALA / DESTELLO */
+        /* EFECTO DE LA BALA */
         #bullet-line {
             position: absolute;
             height: 3px;
-            background: #facc15; /* Color amarillo bala / láser */
+            background: #facc15;
             box-shadow: 0 0 8px #f59e0b, 0 0 2px #fff;
             transform-origin: left center;
             display: none;
@@ -38,12 +38,12 @@
         }
 
         /* Controles (Joystick + Fuego) */
-        .controls-ui { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; height: 140px; }
+        .controls-ui { display: flex; justify-content: space-between; align-items: center; padding-top: 5px; height: 130px; }
 
-        #joystick-base { width: 100px; height: 100px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; position: relative; touch-action: none; }
-        #joystick-stick { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; top: 25px; left: 25px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        #joystick-base { width: 95px; height: 95px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; position: relative; touch-action: none; }
+        #joystick-stick { width: 45px; height: 45px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; top: 23px; left: 23px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
-        #fire-btn { width: 100px; height: 100px; background: #ef4444; border: none; color: white; font-weight: bold; border-radius: 50%; font-size: 16px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.4); touch-action: none; }
+        #fire-btn { width: 95px; height: 95px; background: #ef4444; border: none; color: white; font-weight: bold; border-radius: 50%; font-size: 15px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.4); touch-action: none; }
         #fire-btn:active { background: #dc2626; transform: scale(0.96); }
 
         .back-link { background: none; border: none; color: #64748b; font-size: 11px; cursor: pointer; text-align: left; }
@@ -56,7 +56,7 @@
         <div>
             <div style="font-size: 55px; margin-bottom: 10px;">🧟‍♂️</div>
             <h1 class="title">Zombie Outbreak</h1>
-            <p class="subtitle">Realistic Gun Ops v1.4</p>
+            <p class="subtitle">Big Map Ops v1.5</p>
         </div>
         <div style="width: 100%; max-width: 300px;">
             <button class="btn-main" onclick="startGame()">🎮 Iniciar Supervivencia</button>
@@ -67,7 +67,7 @@
     <div id="game-screen" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <button class="back-link" onclick="stopGame(); showScreen('menu-screen')">◄ Salir al Menú</button>
-            <span id="game-status" style="font-size: 11px; color: #22c55e;">● ZONA DE COMBATE</span>
+            <span id="game-status" style="font-size: 11px; color: #22c55e;">● ZONA AMPLIADA</span>
         </div>
 
         <div class="game-header">
@@ -75,12 +75,13 @@
             <span id="hp-txt" style="color: #ef4444;">Salud: 100%</span>
         </div>
 
-        <!-- Mapa con Obstáculos y Línea de Bala -->
+        <!-- Mapa Extendido con más Obstáculos -->
         <div id="map-container">
-            <div class="obstacle" style="left: 100px; top: 50px; width: 80px; height: 25px;"></div>
-            <div class="obstacle" style="left: 220px; top: 150px; width: 25px; height: 90px;"></div>
-            <div class="obstacle" style="left: 300px; top: 200px; width: 60px; height: 25px;"></div>
-            <div class="obstacle" style="left: 50px; top: 260px; width: 70px; height: 25px;"></div>
+            <div class="obstacle" style="left: 60px; top: 40px; width: 100px; height: 20px;"></div>
+            <div class="obstacle" style="left: 280px; top: 70px; width: 70px; height: 70px;"></div>
+            <div class="obstacle" style="left: 150px; top: 160px; width: 30px; height: 110px;"></div>
+            <div class="obstacle" style="left: 320px; top: 250px; width: 100px; height: 20px;"></div>
+            <div class="obstacle" style="left: 40px; top: 240px; width: 60px; height: 50px;"></div>
 
             <!-- Línea de disparo de la bala -->
             <div id="bullet-line"></div>
@@ -99,7 +100,7 @@
     </div>
 
     <script>
-        let pX = 200, pY = 160; 
+        let pX = 225, pY = 170; 
         let zX = 50, zY = 50;   
         let score = 0;
         let health = 100;
@@ -107,11 +108,16 @@
         let isPlaying = false;
         let animStep = 0;
 
+        // Límites físicos del mapa ampliado (Ancho max ~430, Alto max ~320)
+        const MAP_MAX_X = 430;
+        const MAP_MAX_Y = 320;
+
         const obstacles = [
-            { x1: 100, x2: 180, y1: 50, y2: 75 },
-            { x1: 220, x2: 245, y1: 150, y2: 240 },
-            { x1: 300, x2: 360, y1: 200, y2: 225 },
-            { x1: 50, x2: 120, y1: 260, y2: 285 }
+            { x1: 60, x2: 160, y1: 40, y2: 60 },
+            { x1: 280, x2: 350, y1: 70, y2: 140 },
+            { x1: 150, x2: 180, y1: 160, y2: 270 },
+            { x1: 320, x2: 420, y1: 250, y2: 270 },
+            { x1: 40, x2: 100, y1: 240, y2: 290 }
         ];
 
         // JOYSTICK
@@ -139,9 +145,9 @@
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             const deltaX = clientX - centerX;
             const deltaY = clientY - centerY;
-            joyX = deltaX / 50; 
-            joyY = deltaY / 50;
-            joystickStick.style.transform = `translate(${Math.min(50, Math.max(-50, deltaX))}px, ${Math.min(50, Math.max(-50, deltaY))}px)`;
+            joyX = deltaX / 45; 
+            joyY = deltaY / 45;
+            joystickStick.style.transform = `translate(${Math.min(45, Math.max(-45, deltaX))}px, ${Math.min(45, Math.max(-45, deltaY))}px)`;
         }
 
         function showScreen(id) {
@@ -151,7 +157,7 @@
 
         function startGame() {
             showScreen('game-screen');
-            pX = 200; pY = 160; zX = 50; zY = 50; score = 0; health = 100;
+            pX = 225; pY = 170; zX = 60; zY = 60; score = 0; health = 100;
             isPlaying = true;
             document.getElementById("score-txt").innerText = "Zombies abatidos: 0";
             document.getElementById("hp-txt").innerText = "Salud: 100%";
@@ -162,7 +168,7 @@
         function stopGame() { isPlaying = false; clearInterval(gameInterval); handleEnd(); }
 
         function checkCollision(x, y) {
-            if (x < 15 || x > 385 || y < 15 || y > 305) return true;
+            if (x < 15 || x > MAP_MAX_X || y < 15 || y > MAP_MAX_Y) return true;
             for (let obs of obstacles) {
                 if (x >= obs.x1 - 10 && x <= obs.x2 + 10 && y >= obs.y1 - 10 && y <= obs.y2 + 10) return true;
             }
@@ -178,7 +184,6 @@
                 let nextY = pY + joyY * moveSpeed;
                 if (!checkCollision(nextX, nextY)) { pX = nextX; pY = nextY; }
 
-                // Animación de piernas con pistola en mano
                 animStep++;
                 if(animStep % 4 === 0) {
                     let movingIcons = ["🏃‍♂️🔫", "🚶‍♂️🔫", "🏃‍♂️💥"];
@@ -186,12 +191,12 @@
                 }
             }
 
-            // IA zombie
+            // IA zombie adaptada al mapa grande
             let zDx = 0, zDy = 0;
-            if (zX < pX) zDx = 2.1;
-            if (zX > pX) zDx = -2.1;
-            if (zY < pY) zDy = 2.1;
-            if (zY > pY) zDy = -2.1;
+            if (zX < pX) zDx = 2.0;
+            if (zX > pX) zDx = -2.0;
+            if (zY < pY) zDy = 2.0;
+            if (zY > pY) zDy = -2.0;
             if (!checkCollision(zX + zDx, zY)) zX += zDx;
             if (!checkCollision(zX, zY + zDy)) zY += zDy;
 
@@ -212,7 +217,7 @@
             document.getElementById("zombie").style.top = zY + "px";
         }
 
-        // DISPARO CON EFECTO VISUAL DE BALA
+        // DISPARO
         document.getElementById('fire-btn').addEventListener('mousedown', fireWeapon);
         document.getElementById('fire-btn').addEventListener('touchstart', fireWeapon);
 
@@ -220,11 +225,9 @@
             e.preventDefault();
             if (!isPlaying) return;
             
-            // Mostrar animación de disparo en el personaje
             document.getElementById("player").innerText = "🥷🔥";
             setTimeout(() => { if(isPlaying) document.getElementById("player").innerText = "🥷🔫"; }, 150);
 
-            // Trazar línea de bala desde el jugador hasta el zombie
             let bullet = document.getElementById("bullet-line");
             let dx = zX - pX;
             let dy = zY - pY;
@@ -237,16 +240,15 @@
             bullet.style.transform = `rotate(${angle}deg)`;
             bullet.style.display = "block";
 
-            // Ocultar la bala rápido para simular velocidad de disparo
             setTimeout(() => { bullet.style.display = "none"; }, 80);
 
-            // Verificar si el disparo impacta al zombie (rango de 110px)
-            if (distance < 110) {
+            // Rango de alcance de disparo incrementado acorde al mapa grande
+            if (distance < 150) {
                 score++;
                 document.getElementById("score-txt").innerText = "Zombies abatidos: " + score;
-                // Reaparecer zombie en otra parte
-                zX = Math.random() > 0.5 ? 30 : 370;
-                zY = Math.random() > 0.5 ? 30 : 290;
+                // Reaparecer zombie aleatoriamente en los bordes lejanos del mapa grande
+                zX = Math.random() > 0.5 ? 40 : 400;
+                zY = Math.random() > 0.5 ? 40 : 300;
             }
         }
     </script>
