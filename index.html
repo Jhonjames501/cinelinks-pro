@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BATTLE FIRE: SURVIVAL OPS</title>
+    <title>ZOMBIE SURVIVAL: OUTBREAK</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
         body { 
-            background: #020408; 
+            background: #050508; 
             color: #fff; 
             height: 100vh; 
             display: flex; 
@@ -21,241 +21,266 @@
             width: 100%; 
             height: 100%; 
             max-width: 480px; 
-            padding: 20px; 
+            padding: 15px; 
             flex-direction: column; 
             justify-content: space-between; 
             position: absolute; 
             top: 0; 
-            background: linear-gradient(135deg, #080d16 0%, #020408 100%);
-            border: 1px solid rgba(229, 9, 20, 0.2);
+            background: #090d16;
+            border: 1px solid #1e293b;
         }
         .screen.active { display: flex; }
 
-        /* Pantalla Splash Realista */
-        #splash-screen { 
+        /* Pantalla de Inicio / Menú */
+        #menu-screen { 
             justify-content: center; 
             align-items: center; 
             text-align: center; 
-            background: radial-gradient(circle at center, #150203 0%, #020408 80%);
+            background: radial-gradient(circle at center, #1a0305 0%, #050508 80%);
         }
-        .game-logo {
-            font-size: 38px;
-            font-weight: 900;
-            color: #e50914;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 0 0 20px rgba(229,9,20,0.8), 0 0 10px #000;
-            border-bottom: 2px solid #e50914;
-            padding-bottom: 10px;
+        .title { 
+            font-size: 34px; 
+            font-weight: 900; 
+            color: #ef4444; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            text-shadow: 0 0 15px rgba(239,68,68,0.7);
             margin-bottom: 5px;
         }
-        .game-sub {
-            font-size: 11px;
-            color: #94a3b8;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-        }
+        .subtitle { font-size: 11px; color: #64748b; letter-spacing: 5px; margin-bottom: 30px; }
 
-        /* Botones Estilo Militar Táctico */
-        .btn-military {
+        .btn-main {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(90deg, #1a0203 0%, #e50914 50%, #1a0203 100%);
-            background-size: 200% auto;
-            border: 1px solid #ff4d4d;
-            color: #fff;
+            padding: 15px;
+            background: #ef4444;
+            border: none;
+            color: white;
             font-size: 15px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
-            border-radius: 2px;
-            box-shadow: 0 0 15px rgba(229,9,20,0.4);
-            margin-bottom: 12px;
-            transition: 0.3s;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(239,68,68,0.4);
+            margin-bottom: 10px;
         }
-        .btn-military:active { transform: scale(0.96); filter: brightness(1.2); }
-        .btn-military.secondary {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid #334155;
-            color: #cbd5e1;
-            box-shadow: none;
-        }
+        .btn-main:active { transform: scale(0.97); background: #dc2626; }
 
-        /* Lobby Táctico */
-        .lobby-top {
+        /* Pantalla del Mapa Abierto */
+        .game-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 12px 15px;
-            border-left: 4px solid #e50914;
+            background: #111827;
+            padding: 8px 12px;
             border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            border-left: 4px solid #ef4444;
         }
-        .profile-name { font-weight: bold; font-size: 14px; color: #f8fafc; letter-spacing: 1px; }
-        .profile-status { font-size: 10px; color: #22c55e; }
 
-        .menu-grid { display: flex; flex-direction: column; gap: 12px; margin: auto 0; }
-
-        /* Área de Combate Realista */
-        .combat-zone {
-            background: radial-gradient(circle at center, #1e0507 0%, #05070a 100%);
-            border: 2px solid #334155;
+        /* Mapa Abierto (Área de juego 2D cenital) */
+        #map-container {
+            width: 100%;
+            height: 280px;
+            background: #111c14; /* Tono campo militar / bosque oscuro */
+            border: 2px solid #374151;
             border-radius: 4px;
-            height: 320px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
             position: relative;
             overflow: hidden;
-            margin: auto 0;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
-        .hud-top {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: bold;
-            background: rgba(0,0,0,0.7);
-            padding: 6px 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        #battlefield {
-            width: 100%;
-            height: 210px;
-            position: relative;
-            background: linear-gradient(to bottom, rgba(30,41,59,0.4) 0%, rgba(15,23,42,0.8) 70%, #020408 100%);
-            border-bottom: 2px solid #e50914;
-        }
-        #operator { position: absolute; bottom: 8px; left: 35px; font-size: 26px; filter: drop-shadow(0 0 5px rgba(229,9,20,0.6)); }
-        #hostile { position: absolute; bottom: 8px; right: -40px; font-size: 26px; transition: right 1.6s linear; filter: drop-shadow(0 0 5px rgba(255,0,0,0.8)); }
 
-        .btn-fire {
-            width: 100%;
-            padding: 16px;
-            background: #e50914;
-            border: none;
+        /* Personaje y Zombies */
+        .entity {
+            position: absolute;
+            font-size: 22px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Controles de Movimiento (Pad Direccional + Disparo) */
+        .controls-area {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .ctrl-btn {
+            background: #1f293d;
+            border: 1px solid #475569;
             color: white;
             font-size: 16px;
+            padding: 12px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .ctrl-btn:active { background: #334155; }
+        .fire-action-btn {
+            grid-column: span 3;
+            background: #ef4444;
+            border: none;
+            color: white;
             font-weight: bold;
-            letter-spacing: 2px;
+            padding: 12px;
+            border-radius: 4px;
             cursor: pointer;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .btn-fire:active { background: #b20710; }
+        .fire-action-btn:active { background: #dc2626; }
 
-        .back-btn { background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; text-align: left; letter-spacing: 1px; }
+        .back-link { background: none; border: none; color: #64748b; font-size: 11px; cursor: pointer; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div id="splash-screen" class="screen active">
+    <!-- 1. MENÚ PRINCIPAL -->
+    <div id="menu-screen" class="screen active">
         <div>
-            <div style="font-size: 55px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #e50914);">⚡</div>
-            <h1 class="game-logo">Battle Fire</h1>
-            <p class="game-sub">Tactical Ops v2.4</p>
+            <div style="font-size: 55px; margin-bottom: 10px;">🧟‍♂️</div>
+            <h1 class="title">Zombie Outbreak</h1>
+            <p class="subtitle">Survival Map v1.0</p>
         </div>
-        <div style="width: 100%; max-width: 320px;">
-            <button class="btn-military" onclick="showScreen('lobby-screen')">[ INICIAR SISTEMA ]</button>
-        </div>
-    </div>
-
-    <div id="lobby-screen" class="screen">
-        <div class="lobby-top">
-            <div>
-                <div class="profile-name">OPERATIVE #774</div>
-                <div class="profile-status">● SERVIDOR SEGURO: ACTIVO</div>
-            </div>
-            <div style="font-size: 13px; color: #fbbf24; font-weight: bold;">🪙 9,840</div>
-        </div>
-
-        <div class="menu-grid">
-            <button class="btn-military" onclick="showScreen('game-screen'); startBattle();">🔥 MODO CLÁSICO (ZONA ROJA)</button>
-            <button class="btn-military secondary" onclick="alert('Armería bloqueada: Requiere Rango Oro.')">⚙️ CONFIGURACIÓN Y ARMERÍA</button>
-            <button class="btn-military secondary" onclick="compartirAPK()">🔗 COMPARTIR APLICACIÓN APK</button>
-        </div>
-
-        <div style="text-align: center; color: #334155; font-size: 10px; letter-spacing: 2px;">
-            SECURE ACCESS • MILITARY GRADE ENCRYPTION
+        <div style="width: 100%; max-width: 300px;">
+            <button class="btn-main" onclick="startGame()">🎮 Iniciar Supervivencia</button>
+            <button class="btn-main" style="background: #1f293d; border: 1px solid #374151;" onclick="shareApp()">🔗 Compartir App</button>
         </div>
     </div>
 
+    <!-- 2. MAPA ABIERTO Y JUEGO -->
     <div id="game-screen" class="screen">
-        <button class="back-btn" onclick="showScreen('lobby-screen')">◄ REGRESAR AL LOBBY</button>
-        
-        <div class="combat-zone">
-            <div class="hud-top">
-                <span id="kills-display" style="color: #38bdf8;">BAJAS: 0</span>
-                <span style="color: #ef4444; animation: pulse 1s infinite;">● ZONA DE PELIGRO</span>
-            </div>
-            
-            <div id="battlefield" onclick="triggerShot()">
-                <div id="operator">🪖</div>
-                <div id="hostile">🎯</div>
-            </div>
-            
-            <button class="btn-fire" onclick="triggerShot()">💥 FUEGO / DISPARAR 💥</button>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="back-link" onclick="stopGame(); showScreen('menu-screen')">◄ Salir al Menú</button>
+            <span id="game-status" style="font-size: 11px; color: #22c55e;">● ZONA SEGURA</span>
         </div>
 
-        <p style="text-align: center; font-size: 11px; color: #64748b;">Toca la zona de combate o el botón rojo para abatir al objetivo.</p>
+        <div class="game-header">
+            <span id="score-txt">Zombies abatidos: 0</span>
+            <span id="hp-txt" style="color: #ef4444;">Salud: 100%</span>
+        </div>
+
+        <!-- El Mapa -->
+        <div id="map-container">
+            <div id="player" class="entity" style="left: 50%; top: 50%;">🪖</div>
+            <div id="zombie" class="entity" style="left: 10%; top: 10%;">🧟</div>
+        </div>
+
+        <!-- Controles de Movimiento -->
+        <div class="controls-area">
+            <div></div>
+            <button class="ctrl-btn" onclick="movePlayer(0, -15)">▲</button>
+            <div></div>
+            <button class="ctrl-btn" onclick="movePlayer(-15, 0)">◄</button>
+            <button class="ctrl-btn" onclick="movePlayer(0, 15)">▼</button>
+            <button class="ctrl-btn" onclick="movePlayer(15, 0)">►</button>
+            <button class="fire-action-btn" onclick="fireWeapon()">💥 DISPARAR</button>
+        </div>
     </div>
 
     <script>
-        let totalKills = 0;
-        let inCombat = false;
+        let pX = 200, pY = 140; // Posición inicial del jugador
+        let zX = 50, zY = 50;   // Posición inicial del zombie
+        let score = 0;
+        let health = 100;
+        let gameInterval;
+        let isPlaying = false;
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id !== 'game-screen') inCombat = false;
         }
 
-        function startBattle() {
-            totalKills = 0;
-            inCombat = true;
-            document.getElementById("kills-display").innerText = "BAJAS: 0";
-            deployHostile();
-        }
-
-        function deployHostile() {
-            if (!inCombat) return;
-            let target = document.getElementById("hostile");
-            target.style.transition = "none";
-            target.style.right = "-40px";
+        function startGame() {
+            showScreen('game-screen');
+            pX = 200; pY = 140;
+            score = 0;
+            health = 100;
+            isPlaying = true;
+            document.getElementById("score-txt").innerText = "Zombies abatidos: 0";
+            document.getElementById("hp-txt").innerText = "Salud: 100%";
             
-            setTimeout(() => {
-                if (!inCombat) return;
-                target.style.transition = "right 1.4s linear";
-                target.style.right = "340px";
-            }, 80);
+            // Bucle principal del juego (mueve al zombie hacia ti constantemente)
+            clearInterval(gameInterval);
+            gameInterval = setInterval(updateGame, 80);
         }
 
-        function triggerShot() {
-            if (!inCombat) return;
-            let target = document.getElementById("hostile");
-            let pos = parseInt(window.getComputedStyle(target).getPropertyValue("right"));
+        function stopGame() {
+            isPlaying = false;
+            clearInterval(gameInterval);
+        }
+
+        function movePlayer(dx, dy) {
+            if (!isPlaying) return;
+            pX += dx;
+            pY += dy;
             
-            // Rango de impacto táctico
-            if (pos >= 130 && pos <= 270) {
-                totalKills++;
-                document.getElementById("kills-display").innerText = "BAJAS: " + totalKills;
-                deployHostile();
+            // Limitar al tamaño del mapa (ancho aprox 400, alto 280)
+            if (pX < 15) pX = 15;
+            if (pX > 385) pX = 385;
+            if (pY < 15) pY = 15;
+            if (pY > 265) pY = 265;
+            
+            updatePositions();
+        }
+
+        function updateGame() {
+            if (!isPlaying) return;
+
+            // IA simple del zombie: persigue al jugador paso a paso
+            if (zX < pX) zX += 3;
+            if (zX > pX) zX -= 3;
+            if (zY < pY) zY += 3;
+            if (zY > pY) zY -= 3;
+
+            // Verificar si el zombie te alcanza (colisión)
+            let distancia = Math.hypot(pX - zX, pY - zY);
+            if (distancia < 20) {
+                health -= 5;
+                document.getElementById("hp-txt").innerText = "Salud: " + health + "%";
+                if (health <= 0) {
+                    alert("¡Has sido devorado por los zombies! Fin de la partida.");
+                    stopGame();
+                    showScreen('menu-screen');
+                }
+            }
+
+            updatePositions();
+        }
+
+        function updatePositions() {
+            let playerEl = document.getElementById("player");
+            let zombieEl = document.getElementById("zombie");
+            playerEl.style.left = pX + "px";
+            playerEl.style.top = pY + "px";
+            zombieEl.style.left = zX + "px";
+            zombieEl.style.top = zY + "px";
+        }
+
+        function fireWeapon() {
+            if (!isPlaying) return;
+            
+            // Si disparas y el zombie está cerca, lo eliminas y reaparece lejos
+            let distancia = Math.hypot(pX - zX, pY - zY);
+            if (distancia < 90) {
+                score++;
+                document.getElementById("score-txt").innerText = "Zombies abatidos: " + score;
+                // Reaparecer zombie en otra parte del mapa aleatoria
+                zX = Math.random() > 0.5 ? 20 : 380;
+                zY = Math.random() > 0.5 ? 20 : 250;
             }
         }
 
-        function compartirAPK() {
+        function shareApp() {
             if (navigator.share) {
-                navigator.share({
-                    title: 'Battle Fire Survival',
-                    text: '¡Instala mi app de supervivencia táctica!',
-                    url: window.location.href
-                }).catch(() => {});
+                navigator.share({ title: 'Zombie Outbreak', text: '¡Juega a mi juego de supervivencia zombie!', url: window.location.href }).catch(() => {});
             } else {
-                alert("Enlace copiado para compartir: " + window.location.href);
+                alert("Enlace copiado: " + window.location.href);
             }
         }
     </script>
