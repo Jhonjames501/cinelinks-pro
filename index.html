@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZOMBIE SURVIVAL: V-JOYSTICK</title>
+    <title>ZOMBIE SURVIVAL: REALISTIC SHOOTER</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; user-select: none; }
         body { background: #050508; color: #fff; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
@@ -24,16 +24,25 @@
         #map-container { width: 100%; height: 320px; background: #111c14; border: 2px solid #374151; border-radius: 4px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin-top: 10px; }
 
         .entity { position: absolute; font-size: 24px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transform: translate(-50%, -50%); filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); z-index: 2; }
-        .obstacle { position: absolute; background: #292524; border: 1px solid #57534e; border-radius: 3px; }
+        .obstacle { position: absolute; background: #292524; border: 1px solid #57534e; border-radius: 3px; z-index: 1; }
 
-        /* NUEVO: Área de controles (Joystick + Fuego) */
+        /* EFECTO DE LA BALA / DESTELLO */
+        #bullet-line {
+            position: absolute;
+            height: 3px;
+            background: #facc15; /* Color amarillo bala / láser */
+            box-shadow: 0 0 8px #f59e0b, 0 0 2px #fff;
+            transform-origin: left center;
+            display: none;
+            z-index: 3;
+        }
+
+        /* Controles (Joystick + Fuego) */
         .controls-ui { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; height: 140px; }
 
-        /* NUEVO: Estilo del Joystick Virtual */
         #joystick-base { width: 100px; height: 100px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; position: relative; touch-action: none; }
         #joystick-stick { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; top: 25px; left: 25px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
-        /* Botón de disparo */
         #fire-btn { width: 100px; height: 100px; background: #ef4444; border: none; color: white; font-weight: bold; border-radius: 50%; font-size: 16px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.4); touch-action: none; }
         #fire-btn:active { background: #dc2626; transform: scale(0.96); }
 
@@ -42,17 +51,19 @@
 </head>
 <body>
 
+    <!-- 1. MENÚ PRINCIPAL -->
     <div id="menu-screen" class="screen active">
         <div>
             <div style="font-size: 55px; margin-bottom: 10px;">🧟‍♂️</div>
             <h1 class="title">Zombie Outbreak</h1>
-            <p class="subtitle">V-Joystick Ops v1.3</p>
+            <p class="subtitle">Realistic Gun Ops v1.4</p>
         </div>
         <div style="width: 100%; max-width: 300px;">
             <button class="btn-main" onclick="startGame()">🎮 Iniciar Supervivencia</button>
         </div>
     </div>
 
+    <!-- 2. MAPA DE JUEGO Y CONTROLES -->
     <div id="game-screen" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <button class="back-link" onclick="stopGame(); showScreen('menu-screen')">◄ Salir al Menú</button>
@@ -64,16 +75,21 @@
             <span id="hp-txt" style="color: #ef4444;">Salud: 100%</span>
         </div>
 
+        <!-- Mapa con Obstáculos y Línea de Bala -->
         <div id="map-container">
             <div class="obstacle" style="left: 100px; top: 50px; width: 80px; height: 25px;"></div>
             <div class="obstacle" style="left: 220px; top: 150px; width: 25px; height: 90px;"></div>
             <div class="obstacle" style="left: 300px; top: 200px; width: 60px; height: 25px;"></div>
             <div class="obstacle" style="left: 50px; top: 260px; width: 70px; height: 25px;"></div>
 
-            <div id="player" class="entity" style="left: 50%; top: 50%;">🚶‍♂️</div>
+            <!-- Línea de disparo de la bala -->
+            <div id="bullet-line"></div>
+
+            <div id="player" class="entity" style="left: 50%; top: 50%;">🥷🔫</div>
             <div id="zombie" class="entity" style="left: 15%; top: 15%;">🧟</div>
         </div>
 
+        <!-- CONTROLES -->
         <div class="controls-ui">
             <div id="joystick-base">
                 <div id="joystick-stick"></div>
@@ -89,7 +105,7 @@
         let health = 100;
         let gameInterval;
         let isPlaying = false;
-        let legAnim = false;
+        let animStep = 0;
 
         const obstacles = [
             { x1: 100, x2: 180, y1: 50, y2: 75 },
@@ -98,7 +114,7 @@
             { x1: 50, x2: 120, y1: 260, y2: 285 }
         ];
 
-        // LÓGICA DEL JOYSTICK VIRTUAL
+        // JOYSTICK
         const joystickBase = document.getElementById('joystick-base');
         const joystickStick = document.getElementById('joystick-stick');
         let joystickActive = false;
@@ -111,42 +127,21 @@
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('mouseup', handleEnd);
 
-        function handleStart(e) {
-            if (!isPlaying) return;
-            joystickActive = true;
-            updateJoystick(e);
-        }
-
-        function handleMove(e) {
-            if (!joystickActive || !isPlaying) return;
-            e.preventDefault(); // Evita el scroll de la página
-            updateJoystick(e);
-        }
-
-        function handleEnd(e) {
-            if (!joystickActive) return;
-            joystickActive = false;
-            // Resetear posición visual del stick
-            joystickStick.style.transform = `translate(0px, 0px)`;
-            joyX = 0; joyY = 0;
-        }
+        function handleStart(e) { if (!isPlaying) return; joystickActive = true; updateJoystick(e); }
+        function handleMove(e) { if (!joystickActive || !isPlaying) return; e.preventDefault(); updateJoystick(e); }
+        function handleEnd(e) { joystickActive = false; joystickStick.style.transform = `translate(0px, 0px)`; joyX = 0; joyY = 0; }
 
         function updateJoystick(e) {
             const rect = joystickBase.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
             const deltaX = clientX - centerX;
             const deltaY = clientY - centerY;
-            const distance = Math.min(50, Math.hypot(deltaX, deltaY)); // Limitar a radio de 50px
-
-            joyX = deltaX / 50; // Normalizar entre -1 y 1
+            joyX = deltaX / 50; 
             joyY = deltaY / 50;
-
-            joystickStick.style.transform = `translate(${joyX * 25}px, ${joyY * 25}px)`; // Mover el stick visualmente
+            joystickStick.style.transform = `translate(${Math.min(50, Math.max(-50, deltaX))}px, ${Math.min(50, Math.max(-50, deltaY))}px)`;
         }
 
         function showScreen(id) {
@@ -161,14 +156,10 @@
             document.getElementById("score-txt").innerText = "Zombies abatidos: 0";
             document.getElementById("hp-txt").innerText = "Salud: 100%";
             clearInterval(gameInterval);
-            gameInterval = setInterval(updateGame, 50); // Bucle más rápido para fluidez del joystick
+            gameInterval = setInterval(updateGame, 50);
         }
 
-        function stopGame() {
-            isPlaying = false;
-            clearInterval(gameInterval);
-            handleEnd(); // Resetear joystick al salir
-        }
+        function stopGame() { isPlaying = false; clearInterval(gameInterval); handleEnd(); }
 
         function checkCollision(x, y) {
             if (x < 15 || x > 385 || y < 15 || y > 305) return true;
@@ -181,32 +172,30 @@
         function updateGame() {
             if (!isPlaying) return;
 
-            // MOVER JUGADOR SEGÚN EL JOYSTICK
             if (joystickActive) {
-                let moveSpeed = 7; // Velocidad de movimiento
+                let moveSpeed = 6.5;
                 let nextX = pX + joyX * moveSpeed;
                 let nextY = pY + joyY * moveSpeed;
+                if (!checkCollision(nextX, nextY)) { pX = nextX; pY = nextY; }
 
-                if (!checkCollision(nextX, nextY)) {
-                    pX = nextX;
-                    pY = nextY;
+                // Animación de piernas con pistola en mano
+                animStep++;
+                if(animStep % 4 === 0) {
+                    let movingIcons = ["🏃‍♂️🔫", "🚶‍♂️🔫", "🏃‍♂️💥"];
+                    document.getElementById("player").innerText = movingIcons[Math.floor(Math.random() * 2)];
                 }
-
-                // Animación alterna de piernas
-                legAnim = !legAnim;
-                document.getElementById("player").innerText = legAnim ? "🏃‍♂️" : "🚶‍♂️";
             }
 
-            // IA del zombie (persigue al jugador)
+            // IA zombie
             let zDx = 0, zDy = 0;
-            if (zX < pX) zDx = 2.2;
-            if (zX > pX) zDx = -2.2;
-            if (zY < pY) zDy = 2.2;
-            if (zY > pY) zDy = -2.2;
+            if (zX < pX) zDx = 2.1;
+            if (zX > pX) zDx = -2.1;
+            if (zY < pY) zDy = 2.1;
+            if (zY > pY) zDy = -2.1;
             if (!checkCollision(zX + zDx, zY)) zX += zDx;
             if (!checkCollision(zX, zY + zDy)) zY += zDy;
 
-            // Colisión zombie-jugador
+            // Daño al jugador
             let distancia = Math.hypot(pX - zX, pY - zY);
             if (distancia < 24) {
                 health -= 3;
@@ -217,25 +206,45 @@
                 }
             }
 
-            // Actualizar posiciones
             document.getElementById("player").style.left = pX + "px";
             document.getElementById("player").style.top = pY + "px";
             document.getElementById("zombie").style.left = zX + "px";
             document.getElementById("zombie").style.top = zY + "px";
         }
 
-        // El botón de disparo ahora usa la posición actual del jugador
+        // DISPARO CON EFECTO VISUAL DE BALA
         document.getElementById('fire-btn').addEventListener('mousedown', fireWeapon);
         document.getElementById('fire-btn').addEventListener('touchstart', fireWeapon);
 
         function fireWeapon(e) {
-            e.preventDefault(); // Evita que el toque active el mouse también
+            e.preventDefault();
             if (!isPlaying) return;
             
-            let distancia = Math.hypot(pX - zX, pY - zY);
-            if (distancia < 95) {
+            // Mostrar animación de disparo en el personaje
+            document.getElementById("player").innerText = "🥷🔥";
+            setTimeout(() => { if(isPlaying) document.getElementById("player").innerText = "🥷🔫"; }, 150);
+
+            // Trazar línea de bala desde el jugador hasta el zombie
+            let bullet = document.getElementById("bullet-line");
+            let dx = zX - pX;
+            let dy = zY - pY;
+            let distance = Math.hypot(dx, dy);
+            let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            bullet.style.width = distance + "px";
+            bullet.style.left = pX + "px";
+            bullet.style.top = pY + "px";
+            bullet.style.transform = `rotate(${angle}deg)`;
+            bullet.style.display = "block";
+
+            // Ocultar la bala rápido para simular velocidad de disparo
+            setTimeout(() => { bullet.style.display = "none"; }, 80);
+
+            // Verificar si el disparo impacta al zombie (rango de 110px)
+            if (distance < 110) {
                 score++;
                 document.getElementById("score-txt").innerText = "Zombies abatidos: " + score;
+                // Reaparecer zombie en otra parte
                 zX = Math.random() > 0.5 ? 30 : 370;
                 zY = Math.random() > 0.5 ? 30 : 290;
             }
